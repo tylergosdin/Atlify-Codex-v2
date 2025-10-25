@@ -22,15 +22,15 @@ class Particle {
     this.x = x;
     this.y = y;
     this.seed = Math.random() * Math.PI * 2;
-    this.wave = 5 + Math.random() * 10;
-    this.size = 0.6 + Math.random() * 1;
+    this.wave = 6 + Math.random() * 12;
+    this.size = 0.7 + Math.random() * 1.2;
     this.parallax = 0.3 + Math.random() * 0.7;
   }
 
   update(time) {
-    const t = time * 0.0008;
-    const noiseX = Math.sin(this.baseX * 0.01 + t * 0.9 + this.seed);
-    const noiseY = Math.cos(this.baseY * 0.008 + t * 0.8 + this.seed);
+    const t = time * 0.0015;
+    const noiseX = Math.sin(this.baseX * 0.012 + t * 1.3 + this.seed);
+    const noiseY = Math.cos(this.baseY * 0.01 + t * 1.1 + this.seed);
 
     let targetX = this.baseX + noiseX * this.wave * this.parallax;
     let targetY = this.baseY + noiseY * this.wave;
@@ -48,8 +48,8 @@ class Particle {
       }
     }
 
-    this.x += (targetX - this.x) * 0.045;
-    this.y += (targetY - this.y) * 0.045;
+    this.x += (targetX - this.x) * 0.08;
+    this.y += (targetY - this.y) * 0.08;
   }
 
   draw() {
@@ -78,10 +78,10 @@ function resize() {
 function initParticles() {
   particles = [];
   const area = width * height;
-  const density = 0.005; // particles per pixel
-  const count = Math.max(800, Math.floor(area * density));
+  const density = 0.00125; // particles per pixel
+  const count = Math.max(400, Math.floor(area * density));
   const spacing = Math.sqrt(area / count);
-  const jitter = spacing * 0.55;
+  const jitter = spacing * 0.45;
 
   const cols = Math.ceil(width / spacing) + 1;
   const rows = Math.ceil(height / spacing) + 1;
