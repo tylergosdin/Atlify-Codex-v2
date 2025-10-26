@@ -275,8 +275,8 @@ const CONFIG = {
   clusterMinDist: 70,       // minimum spacing between labels
   clusterCountMin: 3,
   clusterCountMax: 6,
-  clusterSpread: 340,
-  clusterCenterJitter: 70,
+  clusterSpread: 460,
+  clusterCenterJitter: 120,
 
   // Nebula fields (world-units; sized to feel good at zoom ~1)
   nebulaRadius: 270,
@@ -792,7 +792,6 @@ function placeNodeInCluster(cluster, placed) {
 function layoutMainGenreNodes() {
   if (!Array.isArray(GENRES) || GENRES.length === 0) { MAIN_NODES = []; return; }
   const placed = [];
-  const total = GENRES.length;
   const clusterCount = clamp(
     Math.floor(CONFIG.clusterCountMin + Math.random() * (CONFIG.clusterCountMax - CONFIG.clusterCountMin + 1)),
     1,
@@ -800,7 +799,7 @@ function layoutMainGenreNodes() {
   );
   const clusters = generateClusters(clusterCount);
 
-  MAIN_NODES = GENRES.map((g, idx) => {
+  MAIN_NODES = GENRES.map((g) => {
     const cluster = pickCluster(clusters);
     const { x, y } = placeNodeInCluster(cluster, placed);
     cluster.nodes.push({ x, y });
@@ -831,11 +830,6 @@ function layoutMainGenreNodes() {
       const base = 0.55 + Math.random() * 0.45;
       const rr = (CONFIG.nebulaRadius * 0.42 + Math.random() * CONFIG.nebulaRadius * 0.28) * base;
       const axis = lerp(CONFIG.nebulaAnisotropyMin, CONFIG.nebulaAnisotropyMax, Math.random());
-
-      const weight = Math.max(1, rr * rr);
-      centroidX += ox * weight;
-      centroidY += oy * weight;
-      centroidWeight += weight;
 
       sub.push({
         ox, oy, r: rr,
