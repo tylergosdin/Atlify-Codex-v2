@@ -61,8 +61,8 @@ const CONFIG = {
   nodeLabelPx: 14,
 
   // Initial node clustered layout
-  clusterRadius: 260,       // typical cluster radius (world units)
-  clusterJitter: 70,        // extra randomness
+  clusterRadius: 220,       // typical cluster radius (world units)
+  clusterJitter: 55,        // extra randomness
   clusterMinDist: 70,       // minimum spacing between labels
   clusterCountMin: 3,
   clusterCountMax: 6,
@@ -70,12 +70,12 @@ const CONFIG = {
   clusterCenterJitter: 120,
 
   // Nebula fields (world-units; sized to feel good at zoom ~1)
-  nebulaRadius: 320,
+  nebulaRadius: 270,
   nebulaEdgeSoftness: 0.7,
   nebulaAlpha: 0.12,
   nebulaLayersMin: 4,       // per-node randomized count
-  nebulaLayersMax: 8,
-  nebulaLayerJitter: 0.65,
+  nebulaLayersMax: 7,
+  nebulaLayerJitter: 0.52,
   nebulaNoiseStrength: 0.42,  // micro-texture
   nebulaAdditiveGlow: true,
   nebulaAnisotropyMin: 0.45,
@@ -111,47 +111,17 @@ const CONFIG = {
   noiseWarpScale: 0.0026,
 };
 
-/** ========= Space-realistic palette ========= */
-const GENRE_COLORS = {
-  'Pop':        '#ff6bb5',
-  'Rock':       '#ffb25a',
-  'Metal':      '#d5434b',
-  'Punk':       '#ffa64d',
-  'Hip Hop / Rap': '#3fd0c7',
-  'R&B / Soul': '#8f7cff',
-  'Electronic / Dance': '#59e0ff',
-  'Jazz':       '#7bc6ff',
-  'Blues':      '#4aa3ff',
-  'Country / Folk': '#f3d27a',
-  'Reggae / Ska':  '#7ef29a',
-  'Latin / World': '#ff8cc2',
-  'Classical / Orchestral': '#cfd6ff',
-  'Religious / Spiritual / Gospel': '#ffd8f0',
-  'Experimental / Avant-Garde': '#9af0ff',
-  'Soundtrack / Score / Media': '#ffd37a',
-  'Hybrid / Internet-Age Microgenres': '#b184ff',
-};
-
-// Companion (secondary) hues to add nebula depth (close & astrophotography-friendly)
-const GENRE_COLORS_SECONDARY = {
-  'Pop':        '#ff97cf',
-  'Rock':       '#ffd18f',
-  'Metal':      '#ff6a73',
-  'Punk':       '#ffc07a',
-  'Hip Hop / Rap': '#58efe5',
-  'R&B / Soul': '#b49dff',
-  'Electronic / Dance': '#86ecff',
-  'Jazz':       '#a0d8ff',
-  'Blues':      '#77bdff',
-  'Country / Folk': '#f9e0a6',
-  'Reggae / Ska':  '#a7f7be',
-  'Latin / World': '#ffabd2',
-  'Classical / Orchestral': '#e6eaff',
-  'Religious / Spiritual / Gospel': '#ffe4f6',
-  'Experimental / Avant-Garde': '#c5f7ff',
-  'Soundtrack / Score / Media': '#ffe7ad',
-  'Hybrid / Internet-Age Microgenres': '#caa6ff',
-};
+/** ========= Curated nebula gradient (blue-green ➜ red) ========= */
+const NEBULA_GRADIENT_STOPS = [
+  { t: 0.0, color: '#18a7c9' },  // blue-green
+  { t: 0.16, color: '#22c9aa' }, // aqua-green
+  { t: 0.32, color: '#5edb69' }, // lush green
+  { t: 0.48, color: '#c6e357' }, // chartreuse
+  { t: 0.63, color: '#f1a24a' }, // amber-orange transition
+  { t: 0.78, color: '#f45aa5' }, // rosy magenta
+  { t: 0.9, color: '#b35cf4' },  // space purple
+  { t: 1.0, color: '#ff4a4a' },  // vivid red
+];
 
 // Default dot color when outside clouds
 const DOT_BASE_RGB = hexToRgb('#e1e8ff');
@@ -217,6 +187,25 @@ function hexToRgb(hex) {
     ? s.split('').map(c=>c+c).join('')
     : s, 16);
   return { r: (n>>16)&255, g: (n>>8)&255, b: n&255 };
+}
+const NEBULA_GRADIENT = NEBULA_GRADIENT_STOPS.map((stop) => ({
+  t: stop.t,
+  rgb: hexToRgb(stop.color),
+}));
+function sampleGradientRgb(gradient, t) {
+  if (!gradient.length) return { r: 255, g: 255, b: 255 };
+  const v = clamp(t, 0, 1);
+  if (v <= gradient[0].t) return gradient[0].rgb;
+  for (let i = 1; i < gradient.length; i++) {
+    const prev = gradient[i - 1];
+    const curr = gradient[i];
+    if (v <= curr.t || i === gradient.length - 1) {
+      const span = Math.max(1e-6, curr.t - prev.t);
+      const localT = clamp((v - prev.t) / span, 0, 1);
+      return mixRGB(prev.rgb, curr.rgb, localT);
+    }
+  }
+  return gradient[gradient.length - 1].rgb;
 }
 function rgbToCss({r,g,b}, a=1) { return `rgba(${r|0},${g|0},${b|0},${a})`; }
 function lerp(a,b,t){ return a+(b-a)*t; }
@@ -606,10 +595,12 @@ function layoutMainGenreNodes() {
     const { x, y } = placeNodeInCluster(cluster, placed);
     cluster.nodes.push({ x, y });
 
-    const colorHex = GENRE_COLORS[g.name] || '#ffffff';
-    const colorHex2 = GENRE_COLORS_SECONDARY[g.name] || colorHex;
-    const color = hexToRgb(colorHex);
-    const color2 = hexToRgb(colorHex2);
+    const gradientT = total <= 1 ? 0.5 : idx / (total - 1);
+    const accentShift = clamp(gradientT + (Math.random() - 0.5) * 0.22, 0, 1);
+    const baseColorRaw = sampleGradientRgb(NEBULA_GRADIENT, gradientT);
+    const accentColorRaw = sampleGradientRgb(NEBULA_GRADIENT, accentShift);
+    const color = tintTowards(baseColorRaw, DEEP_SPACE_RGB, 0.12 + Math.random() * 0.08);
+    const color2 = tintTowards(accentColorRaw, WHITE_RGB, 0.1 + Math.random() * 0.12);
 
     // Randomized number of sub-blobs per node
     const layers = Math.floor(CONFIG.nebulaLayersMin + Math.random() * (CONFIG.nebulaLayersMax - CONFIG.nebulaLayersMin + 1));
