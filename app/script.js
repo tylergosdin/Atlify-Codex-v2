@@ -12,6 +12,215 @@
 const canvas = document.getElementById('particle-map');
 const ctx = canvas.getContext('2d');
 
+/** ========= Spotify Authentication Modal ========= */
+const spotifyAuth = (() => {
+  const modal = document.getElementById('spotify-auth-modal');
+  if (!modal) {
+    return {
+      init() {},
+      ensurePrompt() {},
+      isAuthenticated() { return false; },
+      getToken() { return null; },
+      requireClientIdConfigured() { return false; },
+    };
+  }
+
+  const statusEl = modal.querySelector('[data-role="status"]');
+  const loginBtn = modal.querySelector('[data-role="login"]');
+  const dismissBtn = modal.querySelector('[data-role="dismiss"]');
+
+  const TOKEN_KEY = 'atlify.spotify.token';
+  const STATE_KEY = 'atlify.spotify.state';
+
+  const scopesAttr = (modal.dataset.scopes || '').trim();
+  const scopes = scopesAttr.length ? scopesAttr.split(/\s+/g) : [];
+  const redirectAttr = (modal.dataset.redirect || '').trim();
+  const redirectUri = redirectAttr || `${window.location.origin}${window.location.pathname}`;
+  const clientId = ((modal.dataset.clientId || '').trim() || (window.SPOTIFY_CLIENT_ID || '')).trim();
+
+  let tokenCache = null;
+
+  function setStatus(message, tone = 'info') {
+    if (!statusEl) return;
+    statusEl.textContent = message || '';
+    if (tone === 'error') {
+      statusEl.setAttribute('data-tone', 'error');
+    } else if (tone === 'success') {
+      statusEl.setAttribute('data-tone', 'success');
+    } else {
+      statusEl.removeAttribute('data-tone');
+    }
+  }
+
+  function showModal() {
+    modal.classList.remove('is-hidden');
+  }
+
+  function hideModal() {
+    modal.classList.add('is-hidden');
+  }
+
+  function safeGet(storage, key) {
+    try { return storage.getItem(key); } catch (err) { console.warn('Storage get failed', err); return null; }
+  }
+
+  function safeSet(storage, key, value) {
+    try { storage.setItem(key, value); }
+    catch (err) { console.warn('Storage set failed', err); }
+  }
+
+  function safeRemove(storage, key) {
+    try { storage.removeItem(key); }
+    catch (err) { console.warn('Storage remove failed', err); }
+  }
+
+  function clearToken() {
+    tokenCache = null;
+    safeRemove(localStorage, TOKEN_KEY);
+  }
+
+  function readStoredToken() {
+    if (tokenCache) {
+      if (Date.now() < tokenCache.expiresAt) return tokenCache;
+      clearToken();
+      return null;
+    }
+    const raw = safeGet(localStorage, TOKEN_KEY);
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return null;
+      if (!parsed.accessToken || !parsed.expiresAt) return null;
+      if (Date.now() >= parsed.expiresAt) {
+        clearToken();
+        return null;
+      }
+      tokenCache = parsed;
+      return parsed;
+    } catch (err) {
+      console.warn('Unable to parse Spotify token payload', err);
+      return null;
+    }
+  }
+
+  function storeToken(payload) {
+    tokenCache = payload;
+    safeSet(localStorage, TOKEN_KEY, JSON.stringify(payload));
+  }
+
+  function generateState() {
+    if (window.crypto?.getRandomValues) {
+      const buffer = new Uint32Array(4);
+      window.crypto.getRandomValues(buffer);
+      return Array.from(buffer).map((n) => n.toString(16).padStart(8, '0')).join('');
+    }
+    return Math.random().toString(16).slice(2);
+  }
+
+  function consumeHashToken() {
+    if (!window.location.hash) return null;
+    const hash = window.location.hash.replace(/^#/, '');
+    if (!hash) return null;
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get('access_token');
+    if (!accessToken) return null;
+
+    const expiresInSec = Number(params.get('expires_in') || '0');
+    const tokenType = params.get('token_type') || 'Bearer';
+    const scope = params.get('scope') || scopes.join(' ');
+    const state = params.get('state') || '';
+    const expectedState = safeGet(sessionStorage, STATE_KEY);
+
+    if (expectedState && state !== expectedState) {
+      setStatus('Authentication mismatch. Please try again.', 'error');
+      safeRemove(sessionStorage, STATE_KEY);
+      window.history.replaceState(null, document.title, window.location.pathname + window.location.search);
+      return null;
+    }
+
+    safeRemove(sessionStorage, STATE_KEY);
+    window.history.replaceState(null, document.title, window.location.pathname + window.location.search);
+
+    return {
+      accessToken,
+      tokenType,
+      scope,
+      expiresAt: Date.now() + Math.max(1, expiresInSec || 0) * 1000,
+    };
+  }
+
+  function startLogin() {
+    if (!clientId) {
+      setStatus('Spotify client ID is not configured.', 'error');
+      showModal();
+      return;
+    }
+
+    const state = generateState();
+    safeSet(sessionStorage, STATE_KEY, state);
+
+    const params = new URLSearchParams({
+      response_type: 'token',
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      scope: scopes.join(' '),
+      state,
+      show_dialog: 'true',
+    });
+
+    window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
+  }
+
+  function attachEvents() {
+    loginBtn?.addEventListener('click', (event) => {
+      event.preventDefault();
+      startLogin();
+    });
+
+    dismissBtn?.addEventListener('click', (event) => {
+      event.preventDefault();
+      hideModal();
+    });
+  }
+
+  function init() {
+    attachEvents();
+
+    const hashToken = consumeHashToken();
+    if (hashToken) {
+      storeToken(hashToken);
+      setStatus('Spotify connected. Enjoy the sonic journey!', 'success');
+      setTimeout(() => hideModal(), 420);
+      return;
+    }
+
+    const stored = readStoredToken();
+    if (stored) {
+      hideModal();
+      return;
+    }
+
+    setStatus('Connect your Spotify account to stream sounds as you explore.');
+    showModal();
+  }
+
+  return {
+    init,
+    ensurePrompt() {
+      if (!readStoredToken()) showModal();
+    },
+    isAuthenticated() {
+      return Boolean(readStoredToken());
+    },
+    getToken() {
+      return readStoredToken();
+    },
+    requireClientIdConfigured() {
+      return Boolean(clientId);
+    },
+  };
+})();
+
 /** ========= Load genres.json ========= */
 let GENRES = [];
 let MAIN_NODES = [];       // [{ name, x, y, color, color2, nebula }]
@@ -44,7 +253,7 @@ const CONFIG = {
   baseSpacing: 85,
   jitterFrac: 0.45,
   targetPx: 1.6,
-  bgFade: 'rgba(2, 2, 6, 0.45)',
+  bgFade: 'rgba(3, 5, 16, 0.5)',
 
   // Motion
   timeScale: 0.0013,
@@ -61,19 +270,27 @@ const CONFIG = {
   nodeLabelPx: 14,
 
   // Initial node clustered layout
-  clusterRadius: 260,       // typical cluster radius (world units)
-  clusterJitter: 70,        // extra randomness
+  clusterRadius: 220,       // typical cluster radius (world units)
+  clusterJitter: 55,        // extra randomness
   clusterMinDist: 70,       // minimum spacing between labels
+  clusterCountMin: 3,
+  clusterCountMax: 6,
+  clusterSpread: 460,
+  clusterCenterJitter: 120,
 
   // Nebula fields (world-units; sized to feel good at zoom ~1)
-  nebulaRadius: 320,
+  nebulaRadius: 270,
   nebulaEdgeSoftness: 0.7,
   nebulaAlpha: 0.12,
   nebulaLayersMin: 4,       // per-node randomized count
-  nebulaLayersMax: 8,
-  nebulaLayerJitter: 0.65,
+  nebulaLayersMax: 7,
+  nebulaLayerJitter: 0.52,
   nebulaNoiseStrength: 0.42,  // micro-texture
   nebulaAdditiveGlow: true,
+  nebulaAnisotropyMin: 0.45,
+  nebulaAnisotropyMax: 0.9,
+  nebulaHighlightIntensity: 0.22,
+  nebulaHighlightWarmth: 0.18,
 
   // Animated vibes
   nebulaDriftAmp: 3,
@@ -83,6 +300,7 @@ const CONFIG = {
   nebulaBreatheSpeed: 0.00006,
   nebulaShimmerAmp: 7,
   nebulaColorPulse: 0.02,
+  nebulaTwinkleAmp: 0.18,
 
   // Particle tinting inside nebulae
   tintStrength: 0.95,
@@ -98,49 +316,21 @@ const CONFIG = {
   noiseGain: 0.5,           // amplitude falloff per octave
   noiseAlphaMin: 0.7,       // alpha multiplier low end
   noiseAlphaMax: 1.0,       // alpha multiplier high end
+  noiseWarpStrength: 0.28,
+  noiseWarpScale: 0.0026,
 };
 
-/** ========= Space-realistic palette ========= */
-const GENRE_COLORS = {
-  'Pop':        '#ff6bb5',
-  'Rock':       '#ffb25a',
-  'Metal':      '#d5434b',
-  'Punk':       '#ffa64d',
-  'Hip Hop / Rap': '#3fd0c7',
-  'R&B / Soul': '#8f7cff',
-  'Electronic / Dance': '#59e0ff',
-  'Jazz':       '#7bc6ff',
-  'Blues':      '#4aa3ff',
-  'Country / Folk': '#f3d27a',
-  'Reggae / Ska':  '#7ef29a',
-  'Latin / World': '#ff8cc2',
-  'Classical / Orchestral': '#cfd6ff',
-  'Religious / Spiritual / Gospel': '#ffd8f0',
-  'Experimental / Avant-Garde': '#9af0ff',
-  'Soundtrack / Score / Media': '#ffd37a',
-  'Hybrid / Internet-Age Microgenres': '#b184ff',
-};
-
-// Companion (secondary) hues to add nebula depth (close & astrophotography-friendly)
-const GENRE_COLORS_SECONDARY = {
-  'Pop':        '#ff97cf',
-  'Rock':       '#ffd18f',
-  'Metal':      '#ff6a73',
-  'Punk':       '#ffc07a',
-  'Hip Hop / Rap': '#58efe5',
-  'R&B / Soul': '#b49dff',
-  'Electronic / Dance': '#86ecff',
-  'Jazz':       '#a0d8ff',
-  'Blues':      '#77bdff',
-  'Country / Folk': '#f9e0a6',
-  'Reggae / Ska':  '#a7f7be',
-  'Latin / World': '#ffabd2',
-  'Classical / Orchestral': '#e6eaff',
-  'Religious / Spiritual / Gospel': '#ffe4f6',
-  'Experimental / Avant-Garde': '#c5f7ff',
-  'Soundtrack / Score / Media': '#ffe7ad',
-  'Hybrid / Internet-Age Microgenres': '#caa6ff',
-};
+/** ========= Curated nebula gradient (blue-green ➜ red) ========= */
+const NEBULA_GRADIENT_STOPS = [
+  { t: 0.0, color: '#18a7c9' },  // blue-green
+  { t: 0.16, color: '#22c9aa' }, // aqua-green
+  { t: 0.32, color: '#5edb69' }, // lush green
+  { t: 0.48, color: '#c6e357' }, // chartreuse
+  { t: 0.63, color: '#f1a24a' }, // amber-orange transition
+  { t: 0.78, color: '#f45aa5' }, // rosy magenta
+  { t: 0.9, color: '#b35cf4' },  // space purple
+  { t: 1.0, color: '#ff4a4a' },  // vivid red
+];
 
 // Default dot color when outside clouds
 const DOT_BASE_RGB = hexToRgb('#e1e8ff');
@@ -207,6 +397,25 @@ function hexToRgb(hex) {
     : s, 16);
   return { r: (n>>16)&255, g: (n>>8)&255, b: n&255 };
 }
+const NEBULA_GRADIENT = NEBULA_GRADIENT_STOPS.map((stop) => ({
+  t: stop.t,
+  rgb: hexToRgb(stop.color),
+}));
+function sampleGradientRgb(gradient, t) {
+  if (!gradient.length) return { r: 255, g: 255, b: 255 };
+  const v = clamp(t, 0, 1);
+  if (v <= gradient[0].t) return gradient[0].rgb;
+  for (let i = 1; i < gradient.length; i++) {
+    const prev = gradient[i - 1];
+    const curr = gradient[i];
+    if (v <= curr.t || i === gradient.length - 1) {
+      const span = Math.max(1e-6, curr.t - prev.t);
+      const localT = clamp((v - prev.t) / span, 0, 1);
+      return mixRGB(prev.rgb, curr.rgb, localT);
+    }
+  }
+  return gradient[gradient.length - 1].rgb;
+}
 function rgbToCss({r,g,b}, a=1) { return `rgba(${r|0},${g|0},${b|0},${a})`; }
 function lerp(a,b,t){ return a+(b-a)*t; }
 function mixRGB(c1, c2, t) {
@@ -216,6 +425,22 @@ function mixRGB(c1, c2, t) {
     b: lerp(c1.b, c2.b, t),
   };
 }
+function clampRGB({ r, g, b }) {
+  return {
+    r: clamp(r, 0, 255),
+    g: clamp(g, 0, 255),
+    b: clamp(b, 0, 255),
+  };
+}
+function tintTowards(c, target, amt) {
+  return clampRGB({
+    r: lerp(c.r, target.r, amt),
+    g: lerp(c.g, target.g, amt),
+    b: lerp(c.b, target.b, amt),
+  });
+}
+const WHITE_RGB = { r: 255, g: 255, b: 255 };
+const DEEP_SPACE_RGB = { r: 18, g: 18, b: 38 };
 
 // Value noise (bilinear) + simple fBM for alpha modulation
 function valueNoise(x, y, seed=777) {
@@ -476,43 +701,123 @@ function randn_bm() { // Box-Muller, mean 0, std 1
   while(v===0) v=Math.random();
   return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
-function tryPlaceCluster(nodes, rMean, jitter, minDist, attemptLimit=1000) {
+function pickCluster(clusters) {
+  if (clusters.length === 1) return clusters[0];
+  const weights = clusters.map(c => 1 / (1 + c.nodes.length * 0.7));
+  const total = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < clusters.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return clusters[i];
+  }
+  return clusters[clusters.length - 1];
+}
+
+function generateClusters(count) {
+  const clusters = [];
+  const spread = CONFIG.clusterSpread;
+  const minDist = CONFIG.clusterMinDist * 3.1;
+  for (let i = 0; i < count; i++) {
+    let candidate = null;
+    let attempts = 0;
+    while (attempts++ < 400) {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = Math.pow(Math.random(), 0.38) * spread;
+      const jitterR = (Math.random() - 0.5) * CONFIG.clusterCenterJitter;
+      const jitterA = (Math.random() - 0.5) * Math.PI * 0.35;
+      const r = Math.max(35, radius + jitterR);
+      const a = angle + jitterA;
+      candidate = {
+        cx: Math.cos(a) * r,
+        cy: Math.sin(a) * r,
+      };
+      let ok = true;
+      for (const c of clusters) {
+        if (Math.hypot(c.cx - candidate.cx, c.cy - candidate.cy) < minDist) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) break;
+    }
+    if (!candidate) {
+      candidate = {
+        cx: (Math.random() - 0.5) * spread * 0.8,
+        cy: (Math.random() - 0.5) * spread * 0.8,
+      };
+    }
+    clusters.push({
+      cx: candidate.cx,
+      cy: candidate.cy,
+      radius: CONFIG.clusterRadius * (0.85 + Math.random() * 0.65),
+      nodes: [],
+    });
+  }
+  return clusters;
+}
+
+function placeNodeInCluster(cluster, placed) {
+  const minDist = CONFIG.clusterMinDist;
   let attempts = 0;
-  while (attempts++ < attemptLimit) {
-    const gx = randn_bm() * (rMean * 0.35);
-    const gy = randn_bm() * (rMean * 0.35);
-    const jx = (Math.random() - 0.5) * jitter;
-    const jy = (Math.random() - 0.5) * jitter;
-    const x = gx + jx, y = gy + jy;
+  while (attempts++ < 800) {
+    const angle = Math.random() * Math.PI * 2;
+    const radial = Math.pow(Math.random(), 0.45) * cluster.radius;
+    const radialJitter = (Math.random() - 0.5) * CONFIG.clusterJitter * 0.9;
+    const tangential = (Math.random() - 0.5) * CONFIG.clusterJitter * 1.2;
+
+    const baseX = cluster.cx + Math.cos(angle) * (radial + radialJitter);
+    const baseY = cluster.cy + Math.sin(angle) * (radial + radialJitter);
+    const tx = Math.cos(angle + Math.PI / 2) * tangential;
+    const ty = Math.sin(angle + Math.PI / 2) * tangential;
+    const x = baseX + tx;
+    const y = baseY + ty;
+
     let ok = true;
-    for (const n of nodes) {
-      const d = Math.hypot(n.x - x, n.y - y);
-      if (d < minDist) { ok = false; break; }
+    for (const n of cluster.nodes) {
+      if (Math.hypot(n.x - x, n.y - y) < minDist) { ok = false; break; }
+    }
+    if (ok) {
+      for (const n of placed) {
+        if (Math.hypot(n.x - x, n.y - y) < minDist * 0.8) { ok = false; break; }
+      }
     }
     if (ok) return { x, y };
   }
-  // fallback if crowded
-  return { x: (Math.random()-0.5)*rMean, y: (Math.random()-0.5)*rMean };
+  return {
+    x: cluster.cx + (Math.random() - 0.5) * cluster.radius * 1.6,
+    y: cluster.cy + (Math.random() - 0.5) * cluster.radius * 1.6,
+  };
 }
 
 function layoutMainGenreNodes() {
   if (!Array.isArray(GENRES) || GENRES.length === 0) { MAIN_NODES = []; return; }
   const placed = [];
+  const clusterCount = clamp(
+    Math.floor(CONFIG.clusterCountMin + Math.random() * (CONFIG.clusterCountMax - CONFIG.clusterCountMin + 1)),
+    1,
+    Math.min(CONFIG.clusterCountMax, GENRES.length)
+  );
+  const clusters = generateClusters(clusterCount);
 
-  MAIN_NODES = GENRES.map((g, idx) => {
-    const { x, y } = tryPlaceCluster(
-      placed, CONFIG.clusterRadius, CONFIG.clusterJitter, CONFIG.clusterMinDist
-    );
+  MAIN_NODES = GENRES.map((g) => {
+    const cluster = pickCluster(clusters);
+    const { x, y } = placeNodeInCluster(cluster, placed);
+    cluster.nodes.push({ x, y });
 
-    const colorHex = GENRE_COLORS[g.name] || '#ffffff';
-    const colorHex2 = GENRE_COLORS_SECONDARY[g.name] || colorHex;
-    const color = hexToRgb(colorHex);
-    const color2 = hexToRgb(colorHex2);
+    const gradientT = total <= 1 ? 0.5 : idx / (total - 1);
+    const accentShift = clamp(gradientT + (Math.random() - 0.5) * 0.22, 0, 1);
+    const baseColorRaw = sampleGradientRgb(NEBULA_GRADIENT, gradientT);
+    const accentColorRaw = sampleGradientRgb(NEBULA_GRADIENT, accentShift);
+    const color = tintTowards(baseColorRaw, DEEP_SPACE_RGB, 0.12 + Math.random() * 0.08);
+    const color2 = tintTowards(accentColorRaw, WHITE_RGB, 0.1 + Math.random() * 0.12);
 
     // Randomized number of sub-blobs per node
     const layers = Math.floor(CONFIG.nebulaLayersMin + Math.random() * (CONFIG.nebulaLayersMax - CONFIG.nebulaLayersMin + 1));
 
     const sub = [];
+    let centroidX = 0;
+    let centroidY = 0;
+    let centroidWeight = 0;
     for (let k = 0; k < layers; k++) {
       const ang = Math.random() * Math.PI * 2;
       const rBias = Math.pow(Math.random(), 1.35);
@@ -522,14 +827,38 @@ function layoutMainGenreNodes() {
       const ox = Math.cos(ang) * localR;
       const oy = Math.sin(ang) * localR;
 
-      const base = 0.5 + Math.random() * 0.4;
-      const rr = (CONFIG.nebulaRadius * 0.45 + Math.random() * CONFIG.nebulaRadius * 0.25) * base;
+      const base = 0.55 + Math.random() * 0.45;
+      const rr = (CONFIG.nebulaRadius * 0.42 + Math.random() * CONFIG.nebulaRadius * 0.28) * base;
+      const axis = lerp(CONFIG.nebulaAnisotropyMin, CONFIG.nebulaAnisotropyMax, Math.random());
 
       sub.push({
         ox, oy, r: rr,
-        phase: Math.random() * Math.PI * 2
+        phase: Math.random() * Math.PI * 2,
+        tilt: Math.random() * Math.PI * 2,
+        axis,
+        spark: Math.random(),
       });
     }
+
+    if (centroidWeight > 0) {
+      const invWeight = 1 / centroidWeight;
+      const cx = centroidX * invWeight;
+      const cy = centroidY * invWeight;
+      for (const blob of sub) {
+        blob.ox -= cx;
+        blob.oy -= cy;
+      }
+    }
+
+    sub.push({
+      ox: 0,
+      oy: 0,
+      r: CONFIG.nebulaRadius * (0.32 + Math.random() * 0.08),
+      phase: Math.random() * Math.PI * 2,
+      tilt: Math.random() * Math.PI * 2,
+      axis: lerp(CONFIG.nebulaAnisotropyMin, CONFIG.nebulaAnisotropyMax, 0.55 + Math.random() * 0.25),
+      spark: 0.52 + Math.random() * 0.18,
+    });
 
     const node = {
       name: g.name, x, y, color, color2,
@@ -588,30 +917,54 @@ function drawNebulae(time) {
       const cx = node.x + driftX + rox + nx;
       const cy = node.y + driftY + roy + ny;
 
+      const warpScale = CONFIG.noiseWarpScale;
+      const warpField = fbm((cx + n.seed) * warpScale, (cy - n.seed) * warpScale, 2, 0.55, 8181);
+      const warpField2 = fbm((cx - n.seed) * warpScale * 1.37, (cy + n.seed) * warpScale * 1.41, 2, 0.6, 9191);
+      const warpAngle = warpField * Math.PI * 2;
+      const warpMag = CONFIG.noiseWarpStrength * blob.r * (0.6 + warpField2 * 0.8);
+      const wcx = cx + Math.cos(warpAngle) * warpMag;
+      const wcy = cy + Math.sin(warpAngle) * warpMag;
+
       const r = blob.r * breathe;
+      const twinkle = 1 + (blob.spark - 0.5) * CONFIG.nebulaTwinkleAmp * Math.sin(t * 0.0007 + blob.phase * 1.9 + n.seed);
 
       // fBM noise for alpha modulation; breaks any lingering patterns
       const ns = CONFIG.noiseScale;
-      const nAlpha = fbm(cx * ns, cy * ns, CONFIG.noiseOctaves, CONFIG.noiseGain, 1234);
-      const alphaMul = lerp(CONFIG.noiseAlphaMin, CONFIG.noiseAlphaMax, nAlpha); // 0.7..1.0
+      const nAlpha = fbm(wcx * ns, wcy * ns, CONFIG.noiseOctaves, CONFIG.noiseGain, 1234 + Math.floor(blob.spark * 500));
+      const alphaMul = lerp(CONFIG.noiseAlphaMin, CONFIG.noiseAlphaMax, nAlpha);
+      const a = CONFIG.nebulaAlpha * alphaMul * twinkle;
 
-      // Bi-color gradient: core -> primary, mid -> mix, outer -> secondary -> transparent
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      const a = CONFIG.nebulaAlpha * alphaMul;
-
-      const midMix = 0.5; // 0..1 mix between c1 & c2 at mid
+      const midMix = 0.35 + blob.spark * 0.35;
       const cm = mixRGB(c1, c2, midMix);
+      const highlight = tintTowards(c1, WHITE_RGB, CONFIG.nebulaHighlightIntensity + blob.spark * 0.12);
+      const glow = tintTowards(cm, WHITE_RGB, CONFIG.nebulaHighlightWarmth + 0.08 * blob.spark);
+      const shadow = tintTowards(c2, DEEP_SPACE_RGB, 0.35);
+      const rim = tintTowards(c2, WHITE_RGB, 0.08 + blob.spark * 0.1);
 
-      grad.addColorStop(0.00, `rgba(${c1.r},${c1.g},${c1.b},${a * 0.85})`);
-      grad.addColorStop(0.22, `rgba(${c1.r},${c1.g},${c1.b},${a * 0.48})`);
-      grad.addColorStop(0.50, `rgba(${cm.r},${cm.g},${cm.b},${a * 0.18})`);
-      grad.addColorStop(0.78, `rgba(${c2.r},${c2.g},${c2.b},${a * 0.06})`);
-      grad.addColorStop(1.00, `rgba(${c2.r},${c2.g},${c2.b},0)`);
+      const axisPulse = 1 + Math.sin(t * 0.0005 + blob.phase * 1.3 + blob.spark * 3.1) * 0.08;
+      const anisotropy = clamp(blob.axis * axisPulse, 0.32, 1.15);
+      const scaleX = 1 + Math.sin(t * 0.0008 + blob.phase * 2.1 + n.seed * 0.17) * 0.12;
+      const scaleY = anisotropy;
+      const rotate = blob.tilt + swirlAngle * 0.6;
+
+      ctx.save();
+      ctx.translate(wcx, wcy);
+      ctx.rotate(rotate);
+      ctx.scale(scaleX, scaleY);
+
+      const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+      grad.addColorStop(0.00, `rgba(${highlight.r},${highlight.g},${highlight.b},${a * 0.95})`);
+      grad.addColorStop(0.18, `rgba(${c1.r},${c1.g},${c1.b},${a * 0.72})`);
+      grad.addColorStop(0.45, `rgba(${cm.r},${cm.g},${cm.b},${a * 0.28})`);
+      grad.addColorStop(0.68, `rgba(${glow.r},${glow.g},${glow.b},${a * 0.16})`);
+      grad.addColorStop(0.86, `rgba(${rim.r},${rim.g},${rim.b},${a * 0.08})`);
+      grad.addColorStop(1.00, `rgba(${shadow.r},${shadow.g},${shadow.b},0)`);
 
       ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
     }
   }
 
@@ -705,6 +1058,7 @@ function animate(time) {
 }
 
 /** ========= Init ========= */
+spotifyAuth.init();
 resize();
 loadGenres();
 requestAnimationFrame(animate);
