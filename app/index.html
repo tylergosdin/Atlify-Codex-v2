@@ -8,6 +8,28 @@
   </head>
   <body>
     <canvas id="particle-map"></canvas>
+    <div
+      id="spotify-auth-modal"
+      class="spotify-modal is-hidden"
+      data-client-id=""
+      data-scopes="streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state"
+      data-redirect=""
+    >
+      <div class="spotify-modal__panel">
+        <h2 class="spotify-modal__title">Connect Spotify to Explore</h2>
+        <p class="spotify-modal__body">
+          Log in with your Spotify account to unlock curated playlists when you drift through each genre nebula.
+        </p>
+        <p class="spotify-modal__status" data-role="status"></p>
+        <div class="spotify-modal__actions">
+          <button class="spotify-modal__button" data-role="login">Log in with Spotify</button>
+          <button class="spotify-modal__button spotify-modal__button--ghost" data-role="dismiss">Maybe later</button>
+        </div>
+        <p class="spotify-modal__footnote">
+          You can connect at any time by using the Spotify control in the corner once you close this prompt.
+        </p>
+      </div>
+    </div>
     <script src="script.js"></script>
   </body>
 </html>
