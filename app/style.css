@@ -42,10 +42,6 @@ canvas {
   z-index: 10;
 }
 
-.spotify-modal[hidden] {
-  display: none;
-}
-
 .spotify-modal.is-hidden {
   opacity: 0;
   visibility: hidden;
