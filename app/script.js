@@ -631,11 +631,6 @@ function layoutMainGenreNodes() {
       const rr = (CONFIG.nebulaRadius * 0.42 + Math.random() * CONFIG.nebulaRadius * 0.28) * base;
       const axis = lerp(CONFIG.nebulaAnisotropyMin, CONFIG.nebulaAnisotropyMax, Math.random());
 
-      const weight = Math.max(1, rr * rr);
-      centroidX += ox * weight;
-      centroidY += oy * weight;
-      centroidWeight += weight;
-
       sub.push({
         ox, oy, r: rr,
         phase: Math.random() * Math.PI * 2,
