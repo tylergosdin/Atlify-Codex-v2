@@ -1,0 +1,774 @@
+[
+  {
+    "name": "Pop",
+    "children": [
+      { "name": "Adult Contemporary" },
+      { "name": "Traditional Pop" },
+      { "name": "Soft Pop" },
+      { "name": "Teen Pop" },
+      { "name": "Art Pop" },
+      { "name": "Baroque Pop" },
+      { "name": "Chamber Pop" },
+      { "name": "Dream Pop" },
+      { "name": "Jangle Pop" },
+      { "name": "Noise Pop" },
+      { "name": "Psychedelic Pop" },
+      { "name": "Folk Pop" },
+      { "name": "Indie Pop" },
+      { "name": "Britpop" },
+      { "name": "Bubblegum Pop" },
+      { "name": "Dance-Pop" },
+      { "name": "Electropop" },
+      { "name": "Europop" },
+      { "name": "Synth-Pop" },
+      { "name": "Power Pop" },
+      { "name": "Pop Rock" },
+      { "name": "Pop Punk" },
+      { "name": "Dark Pop" },
+      { "name": "Hyperpop" },
+      { "name": "Neo Pop" },
+      { "name": "Beach Music" },
+      { "name": "Ambient Pop" },
+      { "name": "Schlager" },
+      { "name": "Christian Pop" },
+      { "name": "Country Pop" },
+      { "name": "Latin Pop" },
+      {
+        "name": "Regional Pop",
+        "children": [
+          { "name": "C-Pop (Chinese Pop)" },
+          { "name": "Cantopop" },
+          { "name": "J-Pop (Japanese Pop)" },
+          { "name": "K-Pop (Korean Pop)" },
+          { "name": "Indo Pop" },
+          { "name": "Pinoy Pop" },
+          { "name": "V-Pop (Vietnamese Pop)" },
+          { "name": "Thai Pop" },
+          { "name": "Turkish Pop" }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Rock",
+    "children": [
+      { "name": "Classic Rock" },
+      { "name": "Hard Rock" },
+      { "name": "Soft Rock" },
+      { "name": "Arena Rock" },
+      { "name": "Heartland Rock" },
+      { "name": "Surf Rock" },
+      { "name": "Southern Rock" },
+      { "name": "Country Rock" },
+      { "name": "Blues Rock" },
+      { "name": "Psychedelic Rock" },
+      { "name": "Garage Rock" },
+      { "name": "Glam Rock" },
+      { "name": "Art Rock" },
+      { "name": "Progressive Rock" },
+      { "name": "Space Rock" },
+      { "name": "Krautrock" },
+      { "name": "Raga Rock" },
+      { "name": "Post-Rock" },
+      { "name": "Industrial Rock" },
+      { "name": "Electronic Rock" },
+      { "name": "Indie Rock" },
+      { "name": "College Rock" },
+      {
+        "name": "Alternative Rock",
+        "children": [
+          { "name": "Grunge" },
+          { "name": "Post-Grunge" },
+          { "name": "Shoegaze" },
+          { "name": "Noise Rock" },
+          { "name": "Math Rock" }
+        ]
+      },
+      { "name": "Gothic Rock" },
+      { "name": "Emo" },
+      { "name": "Punk Rock" },
+      { "name": "Rap Rock" },
+      { "name": "Pop Rock" },
+      { "name": "Visual Kei" }
+    ]
+  },
+  {
+    "name": "Metal",
+    "children": [
+      { "name": "Heavy Metal" },
+      { "name": "Classic Metal" },
+      { "name": "New Wave of British Heavy Metal (NWOBHM)" },
+      { "name": "Speed Metal" },
+      {
+        "name": "Power Metal",
+        "children": [
+          { "name": "Symphonic Power Metal" }
+        ]
+      },
+      {
+        "name": "Thrash Metal",
+        "children": [
+          { "name": "Teutonic Thrash" },
+          { "name": "Crossover Thrash" }
+        ]
+      },
+      { "name": "Groove Metal" },
+      {
+        "name": "Doom Metal",
+        "children": [
+          { "name": "Sludge Metal" },
+          { "name": "Stoner Metal" },
+          { "name": "Doomgaze" }
+        ]
+      },
+      {
+        "name": "Death Metal",
+        "children": [
+          { "name": "Technical Death Metal" },
+          { "name": "Melodic Death Metal" },
+          { "name": "Progressive Death Metal" },
+          { "name": "Brutal Death Metal" },
+          { "name": "Deathgrind" }
+        ]
+      },
+      {
+        "name": "Black Metal",
+        "children": [
+          { "name": "Symphonic Black Metal" },
+          { "name": "Atmospheric Black Metal" },
+          { "name": "Depressive Suicidal Black Metal (DSBM)" },
+          { "name": "War Metal" },
+          { "name": "Post-Black Metal" },
+          { "name": "Blackgaze" }
+        ]
+      },
+      { "name": "Viking Metal" },
+      { "name": "Pagan Metal" },
+      { "name": "Folk Metal" },
+      { "name": "Gothic Metal" },
+      { "name": "Symphonic Metal" },
+      { "name": "Industrial Metal" },
+      { "name": "Electronic Metal" },
+      { "name": "Nu Metal" },
+      { "name": "Rap Metal" },
+      { "name": "Rapcore" },
+      { "name": "Funk Metal" },
+      { "name": "Alternative Metal" },
+      { "name": "Progressive Metal" },
+      { "name": "Avant-Garde Metal" },
+      { "name": "Post-Metal" },
+      { "name": "Japanese Metal" },
+      { "name": "K-Metal" },
+      { "name": "Latin Metal" },
+      { "name": "Scandinavian Metal" },
+      {
+        "name": "Metalcore",
+        "children": [
+          { "name": "Melodic Metalcore" },
+          { "name": "Mathcore" },
+          { "name": "Deathcore" },
+          { "name": "Djent" }
+        ]
+      },
+      {
+        "name": "Grindcore",
+        "children": [
+          { "name": "Goregrind" }
+        ]
+      },
+      { "name": "Crust Metal" },
+      { "name": "Glam Metal / Hair Metal" },
+      { "name": "Pop Metal" },
+      { "name": "Christian Metal" },
+      { "name": "Pirate Metal" },
+      { "name": "Fantasy Metal" }
+    ]
+  },
+  {
+    "name": "Punk",
+    "children": [
+      { "name": "Proto-Punk" },
+      {
+        "name": "Punk Rock",
+        "children": [
+          { "name": "'77 Punk" },
+          { "name": "Pop Punk" },
+          { "name": "Garage Punk" },
+          { "name": "Art Punk" },
+          { "name": "Dance-Punk" },
+          { "name": "Electro-Punk" },
+          { "name": "Industrial Punk" },
+          { "name": "Synth-Punk" },
+          { "name": "Noise Punk" },
+          { "name": "Gothic Punk" },
+          { "name": "Surf Punk" },
+          { "name": "Horror Punk" },
+          { "name": "Comedy Punk" }
+        ]
+      },
+      {
+        "name": "Hardcore Punk",
+        "children": [
+          { "name": "American Hardcore" },
+          { "name": "NYHC (New York Hardcore)" },
+          { "name": "DC Hardcore" },
+          { "name": "Boston Hardcore" },
+          { "name": "UK82" },
+          { "name": "D-Beat" },
+          { "name": "Crust Punk" },
+          { "name": "Powerviolence" },
+          {
+            "name": "Post-Hardcore",
+            "children": [
+              { "name": "Screamo" },
+              { "name": "Emoviolence" },
+              { "name": "Emo Revival" }
+            ]
+          },
+          { "name": "Melodic Hardcore" },
+          { "name": "Crossover Thrash" }
+        ]
+      },
+      {
+        "name": "Post-Punk",
+        "children": [
+          { "name": "Post-Punk Revival" }
+        ]
+      },
+      { "name": "Street Punk" },
+      { "name": "Oi!" },
+      { "name": "Anarcho Punk" },
+      { "name": "Cow Punk" },
+      { "name": "Emo" },
+      {
+        "name": "Folk Punk",
+        "children": [
+          { "name": "Celtic Punk" },
+          { "name": "Gypsy Punk" }
+        ]
+      },
+      { "name": "Ska Punk" },
+      { "name": "Reggae-Punk / Dub Punk" },
+      { "name": "Queercore" },
+      { "name": "Riot Grrrl" },
+      {
+        "name": "Regional / Scene",
+        "children": [
+          { "name": "UK Punk" },
+          { "name": "Scandinavian Punk" },
+          { "name": "Japanese Punk / J-Punk" },
+          { "name": "K-Punk (Korean Punk)" },
+          { "name": "Latin American Punk" },
+          { "name": "Chicano Punk" },
+          { "name": "Aussie Punk" }
+        ]
+      },
+      {
+        "name": "Revival / Internet",
+        "children": [
+          { "name": "Indie Punk" },
+          { "name": "Garage Revival" },
+          { "name": "Pop-Punk Revival" },
+          { "name": "Synth-Punk Revival" },
+          { "name": "Internet Punk" },
+          { "name": "Hyper-Punk" }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Hip Hop / Rap",
+    "children": [
+      { "name": "Old School Hip Hop" },
+      { "name": "Golden Age Hip Hop" },
+      { "name": "East Coast Hip Hop" },
+      { "name": "West Coast Hip Hop" },
+      {
+        "name": "Southern Hip Hop",
+        "children": [
+          { "name": "Crunk" },
+          { "name": "Snap Music" },
+          { "name": "Hyphy" },
+          { "name": "Jerkin" },
+          { "name": "Chopped and Screwed" }
+        ]
+      },
+      { "name": "Midwest Hip Hop" },
+      { "name": "Gangsta Rap" },
+      { "name": "Conscious Rap" },
+      { "name": "Political Hip Hop" },
+      { "name": "Hardcore Hip Hop" },
+      {
+        "name": "Trap",
+        "children": [
+          { "name": "Latin Trap" },
+          { "name": "Trap EDM" },
+          { "name": "Trap Metal" }
+        ]
+      },
+      {
+        "name": "Drill",
+        "children": [
+          { "name": "UK Drill" },
+          { "name": "Spanish Drill" },
+          { "name": "Italian Drill" }
+        ]
+      },
+      { "name": "Cloud Rap" },
+      { "name": "Mumble Rap" },
+      { "name": "Emo Rap" },
+      { "name": "Rage Rap" },
+      { "name": "Experimental Hip Hop" },
+      { "name": "Alternative Hip Hop" },
+      { "name": "Industrial Hip Hop" },
+      { "name": "Horrorcore" },
+      { "name": "Grime" },
+      { "name": "UK Hip Hop" },
+      { "name": "K-Hip Hop" },
+      { "name": "Japanese Hip Hop" },
+      { "name": "German Rap" },
+      { "name": "Afro Trap" },
+      { "name": "Chicano Rap" },
+      { "name": "French Rap" },
+      { "name": "Jazz Rap" },
+      { "name": "Lo-Fi Hip Hop" },
+      { "name": "Pop Rap" },
+      { "name": "Rap Rock" },
+      { "name": "Reggaetón Fusion" }
+    ]
+  },
+  {
+    "name": "R&B / Soul",
+    "children": [
+      { "name": "Rhythm & Blues" },
+      { "name": "Motown Soul" },
+      { "name": "Northern Soul" },
+      {
+        "name": "Southern Soul",
+        "children": [
+          { "name": "Stax Sound" }
+        ]
+      },
+      { "name": "Philly Soul" },
+      { "name": "Chicago Soul" },
+      { "name": "Memphis Soul" },
+      { "name": "Detroit Soul" },
+      { "name": "New Orleans R&B" },
+      {
+        "name": "Funk",
+        "children": [
+          { "name": "Funk Rock" },
+          { "name": "Jazz-Funk" }
+        ]
+      },
+      { "name": "Soul Jazz" },
+      { "name": "Psychedelic Soul" },
+      { "name": "Modern R&B" },
+      { "name": "Contemporary R&B" },
+      { "name": "Neo Soul" },
+      { "name": "Quiet Storm" },
+      { "name": "Alternative R&B" },
+      { "name": "Experimental Soul" },
+      { "name": "Bedroom R&B" },
+      { "name": "Trap Soul" },
+      { "name": "Retro Soul" },
+      { "name": "R&B Pop" },
+      { "name": "Gospel Soul" },
+      { "name": "Hip Hop Soul" },
+      { "name": "Lo-Fi R&B" },
+      { "name": "Chill R&B" },
+      { "name": "UK Soul" },
+      { "name": "K-R&B" }
+    ]
+  },
+  {
+    "name": "Electronic / Dance",
+    "children": [
+      {
+        "name": "House",
+        "children": [
+          { "name": "Chicago House" },
+          { "name": "Deep House" },
+          { "name": "Tech House" },
+          { "name": "Progressive House" },
+          { "name": "Tropical House" },
+          { "name": "Electro House" },
+          { "name": "Future House" },
+          { "name": "French House" },
+          { "name": "Acid House" }
+        ]
+      },
+      {
+        "name": "Techno",
+        "children": [
+          { "name": "Detroit Techno" },
+          { "name": "Minimal Techno" },
+          { "name": "Acid Techno" },
+          { "name": "Industrial Techno" },
+          { "name": "Dub Techno" },
+          { "name": "Schranz" }
+        ]
+      },
+      {
+        "name": "Trance",
+        "children": [
+          { "name": "Classic Trance" },
+          { "name": "Progressive Trance" },
+          { "name": "Uplifting Trance" },
+          { "name": "Psytrance" },
+          { "name": "Goa Trance" },
+          { "name": "Hard Trance" }
+        ]
+      },
+      {
+        "name": "Drum & Bass",
+        "children": [
+          { "name": "Jungle" },
+          { "name": "Liquid Funk" },
+          { "name": "Neurofunk" }
+        ]
+      },
+      {
+        "name": "Dubstep",
+        "children": [
+          { "name": "Riddim" },
+          { "name": "Brostep" }
+        ]
+      },
+      { "name": "Trap EDM" },
+      { "name": "Moombahton" },
+      { "name": "Jersey Club" },
+      {
+        "name": "Ambient",
+        "children": [
+          { "name": "Drone" },
+          { "name": "Electroacoustic" }
+        ]
+      },
+      {
+        "name": "Downtempo",
+        "children": [
+          { "name": "Chillwave" },
+          { "name": "Vaporwave" }
+        ]
+      },
+      { "name": "IDM (Intelligent Dance Music)" },
+      { "name": "Glitch" },
+      {
+        "name": "Synthwave",
+        "children": [
+          { "name": "Retrowave" }
+        ]
+      },
+      { "name": "Future Bass" },
+      { "name": "Hyperpop" },
+      { "name": "Nightcore" },
+      { "name": "Phonk" },
+      { "name": "EDM Pop" },
+      { "name": "Electroclash" },
+      { "name": "Witch House" }
+    ]
+  },
+  {
+    "name": "Jazz",
+    "children": [
+      { "name": "New Orleans Jazz" },
+      { "name": "Dixieland" },
+      { "name": "Swing" },
+      { "name": "Bebop" },
+      { "name": "Hard Bop" },
+      { "name": "Cool Jazz" },
+      { "name": "West Coast Jazz" },
+      { "name": "Modal Jazz" },
+      { "name": "Free Jazz" },
+      { "name": "Avant-Garde Jazz" },
+      {
+        "name": "Fusion",
+        "children": [
+          { "name": "Jazz-Rock" },
+          { "name": "Jazz-Funk" },
+          { "name": "Acid Jazz" }
+        ]
+      },
+      { "name": "Smooth Jazz" },
+      { "name": "Nu Jazz" },
+      { "name": "Contemporary Jazz" },
+      {
+        "name": "Latin Jazz",
+        "children": [
+          { "name": "Afro-Cuban Jazz" },
+          { "name": "Bossa Nova Jazz" }
+        ]
+      },
+      { "name": "European Jazz" },
+      { "name": "Gypsy Jazz" },
+      { "name": "Japanese Jazz" }
+    ]
+  },
+  {
+    "name": "Blues",
+    "children": [
+      { "name": "Delta Blues" },
+      { "name": "Country Blues" },
+      { "name": "Chicago Blues" },
+      { "name": "Memphis Blues" },
+      { "name": "Texas Blues" },
+      { "name": "Electric Blues" },
+      { "name": "Jump Blues" },
+      { "name": "Soul Blues" },
+      { "name": "Piano Blues" },
+      { "name": "Blues Rock" },
+      { "name": "Gospel Blues" },
+      { "name": "Swamp Blues" },
+      { "name": "British Blues" },
+      { "name": "Modern Blues" },
+      { "name": "Lo-Fi Blues" }
+    ]
+  },
+  {
+    "name": "Country / Folk",
+    "children": [
+      {
+        "name": "Country",
+        "children": [
+          { "name": "Classic Country" },
+          { "name": "Honky-Tonk" },
+          { "name": "Western Swing" },
+          { "name": "Bakersfield Sound" },
+          { "name": "Outlaw Country" },
+          { "name": "Nashville Sound" },
+          { "name": "Country Pop" },
+          { "name": "Country Rock" },
+          { "name": "Alt-Country" },
+          { "name": "Americana" },
+          { "name": "Red Dirt" },
+          { "name": "Southern Gothic Country" },
+          { "name": "Cowboy Western" }
+        ]
+      },
+      {
+        "name": "Folk",
+        "children": [
+          { "name": "Traditional Folk" },
+          { "name": "Contemporary Folk" },
+          { "name": "Indie Folk" },
+          { "name": "Folk Rock" },
+          { "name": "Psychedelic Folk" },
+          { "name": "Freak Folk" },
+          { "name": "Anti-Folk" },
+          { "name": "Celtic Folk" },
+          { "name": "Nordic Folk" },
+          { "name": "Appalachian Folk" },
+          { "name": "Canadian Folk" },
+          { "name": "British Folk" },
+          { "name": "Irish Folk" },
+          { "name": "Australian Bush Music" }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Reggae / Ska",
+    "children": [
+      {
+        "name": "Reggae",
+        "children": [
+          { "name": "Roots Reggae" },
+          { "name": "Dub" },
+          { "name": "Rocksteady" },
+          { "name": "Dancehall" },
+          { "name": "Ragga" },
+          { "name": "Reggae Fusion" },
+          { "name": "Lovers Rock" },
+          { "name": "Dub Poetry" },
+          { "name": "Digital Reggae" },
+          { "name": "Reggae-Rock" }
+        ]
+      },
+      {
+        "name": "Ska",
+        "children": [
+          { "name": "Third Wave Ska" },
+          { "name": "Ska Punk" }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Latin / World",
+    "children": [
+      {
+        "name": "Latin",
+        "children": [
+          { "name": "Salsa" },
+          { "name": "Merengue" },
+          { "name": "Bachata" },
+          { "name": "Cumbia" },
+          { "name": "Reggaetón" },
+          { "name": "Latin Trap" },
+          { "name": "Latin Pop" },
+          { "name": "Latin Rock" },
+          { "name": "Bolero" },
+          { "name": "Mambo" },
+          { "name": "Tango" }
+        ]
+      },
+      {
+        "name": "Brazil",
+        "children": [
+          { "name": "Bossa Nova" },
+          { "name": "Samba" }
+        ]
+      },
+      {
+        "name": "Africa",
+        "children": [
+          { "name": "Afrobeat" },
+          { "name": "Afro-Fusion" },
+          { "name": "Afropop" },
+          { "name": "Highlife" },
+          { "name": "Soukous" },
+          { "name": "Kizomba" },
+          { "name": "Amapiano" },
+          { "name": "Gqom" }
+        ]
+      },
+      {
+        "name": "Middle East / North Africa",
+        "children": [
+          { "name": "Rai" },
+          { "name": "Arabic Pop" },
+          { "name": "Turkish Pop" }
+        ]
+      },
+      {
+        "name": "South Asia",
+        "children": [
+          { "name": "Desi Pop" },
+          { "name": "Indian Pop" }
+        ]
+      },
+      {
+        "name": "East Asia",
+        "children": [
+          { "name": "Chinese Traditional" },
+          { "name": "J-Folk" },
+          { "name": "Thai Pop" },
+          { "name": "Pinoy Pop" }
+        ]
+      },
+      { "name": "Balkan Folk" },
+      { "name": "Klezmer" }
+    ]
+  },
+  {
+    "name": "Classical / Orchestral",
+    "children": [
+      {
+        "name": "Historical Periods",
+        "children": [
+          { "name": "Medieval" },
+          { "name": "Renaissance" },
+          { "name": "Baroque" },
+          { "name": "Classical Period" },
+          { "name": "Romantic" },
+          { "name": "Impressionist" },
+          { "name": "20th Century" },
+          { "name": "Contemporary Classical" }
+        ]
+      },
+      {
+        "name": "Styles / Forms",
+        "children": [
+          { "name": "Minimalism" },
+          { "name": "Avant-Garde Classical" },
+          { "name": "Chamber Music" },
+          { "name": "Orchestral" },
+          { "name": "Opera" },
+          { "name": "Choral" },
+          { "name": "Film Score" },
+          { "name": "Neoclassical" }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Religious / Spiritual / Gospel",
+    "children": [
+      { "name": "Gospel" },
+      { "name": "Contemporary Christian" },
+      { "name": "Christian Rock" },
+      { "name": "Christian Pop" },
+      { "name": "Catholic Hymnal" },
+      { "name": "Spirituals" },
+      { "name": "Devotional Music" },
+      { "name": "Jewish Music" },
+      { "name": "Islamic Nasheed" },
+      { "name": "Buddhist Chant" },
+      { "name": "Hindu Bhajan" },
+      { "name": "New Age Spiritual" },
+      { "name": "Gospel Blues" },
+      { "name": "Gospel Rap" }
+    ]
+  },
+  {
+    "name": "Experimental / Avant-Garde",
+    "children": [
+      { "name": "Noise Music" },
+      { "name": "Drone" },
+      { "name": "Musique Concrète" },
+      { "name": "Sound Collage" },
+      { "name": "Field Recordings" },
+      { "name": "Free Improvisation" },
+      { "name": "Electroacoustic" },
+      { "name": "Glitch" },
+      { "name": "Ambient Drone" },
+      { "name": "Minimalism" },
+      { "name": "Post-Industrial" },
+      { "name": "Dark Ambient" },
+      { "name": "Experimental Rock" },
+      { "name": "Experimental Electronic" },
+      { "name": "Avant-Prog" },
+      { "name": "Industrial Noise" }
+    ]
+  },
+  {
+    "name": "Soundtrack / Score / Media",
+    "children": [
+      { "name": "Film Score" },
+      { "name": "Television Soundtrack" },
+      { "name": "Video Game Music" },
+      { "name": "Trailer Music" },
+      { "name": "Musical Theatre" },
+      { "name": "Broadway Cast Recordings" },
+      { "name": "Anime Score" },
+      { "name": "Orchestral Score" },
+      { "name": "Ambient Game Score" },
+      { "name": "Synth Score" },
+      { "name": "Sound Collage OST" }
+    ]
+  },
+  {
+    "name": "Hybrid / Internet-Age Microgenres",
+    "children": [
+      { "name": "Vaporwave" },
+      { "name": "Chillwave" },
+      { "name": "Future Funk" },
+      { "name": "Phonk" },
+      { "name": "Lo-Fi Hip Hop" },
+      { "name": "Chillhop" },
+      { "name": "Witch House" },
+      { "name": "Dreamcore" },
+      { "name": "Breakcore" },
+      { "name": "Nightcore" },
+      { "name": "Hyperpop" },
+      { "name": "Cloudcore" },
+      { "name": "PluggnB" },
+      { "name": "Digicore" },
+      { "name": "Glitchcore" },
+      { "name": "Slowed + Reverb" },
+      { "name": "Meme Music" },
+      { "name": "Mashup Culture" }
+    ]
+  }
+]
