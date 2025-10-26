@@ -615,6 +615,9 @@ function layoutMainGenreNodes() {
     const layers = Math.floor(CONFIG.nebulaLayersMin + Math.random() * (CONFIG.nebulaLayersMax - CONFIG.nebulaLayersMin + 1));
 
     const sub = [];
+    let centroidX = 0;
+    let centroidY = 0;
+    let centroidWeight = 0;
     for (let k = 0; k < layers; k++) {
       const ang = Math.random() * Math.PI * 2;
       const rBias = Math.pow(Math.random(), 1.35);
@@ -636,6 +639,26 @@ function layoutMainGenreNodes() {
         spark: Math.random(),
       });
     }
+
+    if (centroidWeight > 0) {
+      const invWeight = 1 / centroidWeight;
+      const cx = centroidX * invWeight;
+      const cy = centroidY * invWeight;
+      for (const blob of sub) {
+        blob.ox -= cx;
+        blob.oy -= cy;
+      }
+    }
+
+    sub.push({
+      ox: 0,
+      oy: 0,
+      r: CONFIG.nebulaRadius * (0.32 + Math.random() * 0.08),
+      phase: Math.random() * Math.PI * 2,
+      tilt: Math.random() * Math.PI * 2,
+      axis: lerp(CONFIG.nebulaAnisotropyMin, CONFIG.nebulaAnisotropyMax, 0.55 + Math.random() * 0.25),
+      spark: 0.52 + Math.random() * 0.18,
+    });
 
     const node = {
       name: g.name, x, y, color, color2,
