@@ -799,7 +799,9 @@ function layoutMainGenreNodes() {
   );
   const clusters = generateClusters(clusterCount);
 
-  MAIN_NODES = GENRES.map((g) => {
+  const total = GENRES.length;
+
+  MAIN_NODES = GENRES.map((g, idx) => {
     const cluster = pickCluster(clusters);
     const { x, y } = placeNodeInCluster(cluster, placed);
     cluster.nodes.push({ x, y });
