@@ -1,0 +1,26 @@
+{
+  "dims": 64,
+  "items": [
+    { "name": "Pop", "kind": "primary" },
+    { "name": "Rock", "kind": "primary" },
+
+    { "name": "Pop Rock", "kind": "sub" },
+    { "name": "Power Pop", "kind": "sub" },
+    { "name": "Britpop", "kind": "sub" },
+    { "name": "Jangle Pop", "kind": "sub" },
+    { "name": "Dance-Pop", "kind": "sub" },
+    { "name": "Synth-Pop", "kind": "sub" },
+    { "name": "Indie Pop", "kind": "sub" },
+    { "name": "Hyperpop", "kind": "sub" },
+
+    { "name": "Classic Rock", "kind": "sub" },
+    { "name": "Hard Rock", "kind": "sub" },
+    { "name": "Punk Rock", "kind": "sub" },
+    { "name": "Garage Rock", "kind": "sub" },
+    { "name": "Grunge", "kind": "sub" },
+    { "name": "Shoegaze", "kind": "sub" },
+    { "name": "Art Rock", "kind": "sub" },
+    { "name": "Post-Rock", "kind": "sub" },
+    { "name": "Noise Rock", "kind": "sub" }
+  ]
+}
