@@ -253,6 +253,7 @@ const CONFIG = {
   baseSpacing: 85,
   jitterFrac: 0.45,
   targetPx: 1.6,
+  targetPxSizeVariation: 0.12, // max +/- percentage of particle size jitter
   bgFade: 'rgba(3, 5, 16, 0.5)',
 
   // Motion
@@ -625,7 +626,7 @@ function drawOctave(i, time, alpha) {
   const gy0 = Math.floor(top / spacing);
   const gy1 = Math.ceil(bottom / spacing);
 
-  const radiusWorld = CONFIG.targetPx / Zi;
+  const baseRadiusWorld = CONFIG.targetPx / Zi;
 
   const effectivePointerRadiusWorld = pointer.baseRadiusPx / camera.zoom;
   const effectivePointerStrength = pointer.strengthBase / camera.zoom;
@@ -675,6 +676,10 @@ function drawOctave(i, time, alpha) {
       const r = lerp(DOT_BASE_RGB.r, tint.r, tint.a);
       const g = lerp(DOT_BASE_RGB.g, tint.g, tint.a);
       const b = lerp(DOT_BASE_RGB.b, tint.b, tint.a);
+
+      const sizeHash = hash2D(gx, gy, 6000 + i * 3373);
+      const sizeFactor = 1 + (sizeHash - 0.5) * CONFIG.targetPxSizeVariation;
+      const radiusWorld = baseRadiusWorld * sizeFactor;
 
       ctx.fillStyle = rgbToCss({ r, g, b }, 0.78);
       ctx.beginPath();
