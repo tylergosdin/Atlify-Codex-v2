@@ -718,89 +718,27 @@ function computeParentWeightForRecord(rec, weightMap) {
 }
 
 function computeRecordBarycenter(rec, context, fallback) {
-  const fallbackPoint = fallback || { x: camera.x, y: camera.y };
   if (!rec || !Array.isArray(rec.parents) || !rec.parents.length) {
-    return {
-      x: fallbackPoint.x,
-      y: fallbackPoint.y,
-      baseX: fallbackPoint.x,
-      baseY: fallbackPoint.y,
-      centroidX: fallbackPoint.x,
-      centroidY: fallbackPoint.y,
-      centrality: 0,
-    };
+    return fallback || { x: camera.x, y: camera.y };
   }
-
-  const contributions = [];
   let sx = 0;
   let sy = 0;
   let sw = 0;
   for (const parentName of rec.parents) {
     const node = MAIN_NODE_BY_NAME.get(parentName);
     if (!node) continue;
-    const w = context.weightMap.get(parentName) || 0;
-    if (w <= 0) continue;
+    const w = context.weightMap.get(parentName);
+    if (!w) continue;
     sx += node.x * w;
     sy += node.y * w;
     sw += w;
-    contributions.push({ node, weight: w });
   }
-
-  if (sw <= 1e-5) {
-    return {
-      x: fallbackPoint.x,
-      y: fallbackPoint.y,
-      baseX: fallbackPoint.x,
-      baseY: fallbackPoint.y,
-      centroidX: fallbackPoint.x,
-      centroidY: fallbackPoint.y,
-      centrality: 0,
-    };
+  if (sw > 1e-5) {
+    const inv = 1 / sw;
+    return { x: sx * inv, y: sy * inv };
   }
-
-  const inv = 1 / sw;
-  const baseX = sx * inv;
-  const baseY = sy * inv;
-
-  let finalX = baseX;
-  let finalY = baseY;
-  let centroidX = baseX;
-  let centroidY = baseY;
-  let centrality = 0;
-
-  if (contributions.length >= 2) {
-    centroidX = 0;
-    centroidY = 0;
-    for (const entry of contributions) {
-      centroidX += entry.node.x;
-      centroidY += entry.node.y;
-    }
-    const invCount = 1 / contributions.length;
-    centroidX *= invCount;
-    centroidY *= invCount;
-
-    let maxNorm = 0;
-    for (const entry of contributions) {
-      const norm = entry.weight * inv;
-      if (norm > maxNorm) maxNorm = norm;
-    }
-    const uniform = invCount;
-    const denom = Math.max(1e-5, 1 - uniform);
-    const balance = clamp((1 - maxNorm) / denom, 0, 1);
-
-    let spread = 0;
-    for (const entry of contributions) {
-      spread += Math.hypot(entry.node.x - centroidX, entry.node.y - centroidY);
-    }
-    spread *= invCount;
-    const spreadNorm = clamp(spread / (CONFIG.nebulaRadius * 0.9), 0, 1);
-
-    centrality = clamp((0.35 + 0.65 * spreadNorm) * Math.pow(balance, 0.85), 0, 0.95);
-    finalX = baseX + (centroidX - baseX) * centrality;
-    finalY = baseY + (centroidY - baseY) * centrality;
-  }
-
-  return { x: finalX, y: finalY, baseX, baseY, centroidX, centroidY, centrality };
+  if (fallback) return { x: fallback.x, y: fallback.y };
+  return { x: camera.x, y: camera.y };
 }
 
 function getRecordJitter(rec) {
@@ -970,39 +908,15 @@ function applyVisibleSubgenres(visible, context, basisInfo, zoomAlpha) {
     const bary = computeRecordBarycenter(rec, context, context.barycenter);
     let targetX = bary.x;
     let targetY = bary.y;
-    const centrality = bary.centrality ?? 0;
     if (basisInfo && basisInfo.projections?.has(rec)) {
       const proj = basisInfo.projections.get(rec);
-      const tighten = clamp(1 - 0.35 * centrality, 0.45, 1);
-      const adjustedScale = scale * tighten;
-      targetX += proj.x * adjustedScale;
-      targetY += proj.y * adjustedScale;
+      targetX += proj.x * scale;
+      targetY += proj.y * scale;
     } else {
       const jitter = getRecordJitter(rec);
-      const jitterScale = 0.65 + item.parentWeight * 0.45;
-      const jitterRadius = jitter.radius * jitterScale;
-      if (centrality > 1e-3 && bary.baseX != null && bary.baseY != null) {
-        const dirX = (bary.centroidX ?? bary.x) - bary.baseX;
-        const dirY = (bary.centroidY ?? bary.y) - bary.baseY;
-        const dirLen = Math.hypot(dirX, dirY);
-        let offsetX = Math.cos(jitter.angle) * jitterRadius;
-        let offsetY = Math.sin(jitter.angle) * jitterRadius;
-        if (dirLen > 1e-3) {
-          const normX = dirX / dirLen;
-          const normY = dirY / dirLen;
-          const align = clamp(0.35 + 0.5 * centrality, 0, 1);
-          const alignedX = normX * jitterRadius;
-          const alignedY = normY * jitterRadius;
-          offsetX = offsetX * (1 - align) + alignedX * align;
-          offsetY = offsetY * (1 - align) + alignedY * align;
-        }
-        const contraction = 1 - 0.45 * centrality;
-        targetX += offsetX * contraction;
-        targetY += offsetY * contraction;
-      } else {
-        targetX += Math.cos(jitter.angle) * jitterRadius;
-        targetY += Math.sin(jitter.angle) * jitterRadius;
-      }
+      const jitterScale = 0.8 + item.parentWeight * 0.4;
+      targetX += Math.cos(jitter.angle) * jitter.radius * jitterScale;
+      targetY += Math.sin(jitter.angle) * jitter.radius * jitterScale;
     }
     const alpha = clamp(item.alphaBase * zoomAlpha, 0, 1);
     const state = ensureSubState(rec.name, bary.x, bary.y);
